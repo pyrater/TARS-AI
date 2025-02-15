@@ -96,12 +96,18 @@ def load_config():
     sys.path.append(os.getcwd())
 
     # Parse the main config.ini file
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Ensures it resolves to src/
     config = configparser.ConfigParser()
-    config.read('config.ini')
+    config_path = os.path.join(base_dir, 'config.ini')  # Ensures it joins "src/config.ini"
+    config.read(config_path)  # Should correctly read "src/config.ini"
 
     # Parse the persona.ini file
+    character_path = config.get("CHAR", "character_card_path")  # Get full path
+    character_name = os.path.splitext(os.path.basename(character_path))[0]  # Extract filename without extension
+
     persona_config = configparser.ConfigParser()
-    persona_path = os.path.join(base_dir, 'character', 'persona.ini')
+    persona_path = os.path.join(base_dir, 'character', character_name, 'persona.ini')
+
     if not os.path.exists(persona_path):
         print(f"ERROR: {persona_path} not found.")
         sys.exit(1)  # Exit if persona.ini is missing

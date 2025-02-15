@@ -12,12 +12,12 @@ import json
 import requests
 from typing import List
 from datetime import datetime
-from hyperdb import HyperDB
+from modules.module_hyperdb import HyperDB
 import numpy as np
 
 # === Custom Modules ===
-from memory.hyperdb import *
-from module_config import load_config
+from modules.module_hyperdb import *
+from modules.module_config import load_config
 
 CONFIG = load_config()
 
@@ -29,7 +29,7 @@ class MemoryManager:
         self.config = config
         self.char_name = char_name
         self.char_greeting = char_greeting
-        self.memory_db_path = os.path.abspath(f"memory/{self.char_name}.pickle.gz")
+        self.memory_db_path = os.path.abspath(os.path.join(os.path.join("..", "memory"), f"{self.char_name}.pickle.gz"))
         
         # Load RAG configuration from dictionary
         rag_config = self.config.get('RAG', {})  # Get RAG section or empty dict if not exists
@@ -40,8 +40,7 @@ class MemoryManager:
         # Initialize HyperDB with the RAG strategy
         self.hyper_db = HyperDB(rag_strategy=self.rag_strategy)
         self.long_mem_use = True
-        self.initial_memory_path = os.path.abspath("memory/initial_memory.json")
-        
+        self.initial_memory_path =  os.path.abspath(os.path.join(os.path.join("..", "memory", "initial_memory.json")))
         self.init_dynamic_memory()
         self.load_initial_memory(self.initial_memory_path)
 

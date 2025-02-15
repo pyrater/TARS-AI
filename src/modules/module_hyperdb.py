@@ -31,7 +31,7 @@ from sentence_transformers import CrossEncoder
 import configparser
 import torch
 
-from module_config import get_api_key
+from modules.module_config import get_api_key
 
 config = configparser.ConfigParser()
 config.read('config.ini')

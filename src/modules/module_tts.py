@@ -18,8 +18,8 @@ import numpy as np
 import sounddevice as sd
 import soundfile as sf
 from io import BytesIO
-from module_piper import *
-from module_silero import text_to_speech_with_pipelining_silero
+from modules.module_piper import *
+from modules.module_silero import text_to_speech_with_pipelining_silero
 from elevenlabs.client import ElevenLabs
 from elevenlabs import play
 

@@ -12,10 +12,10 @@ in-app commands.
 import evdev
 import time
 from datetime import datetime
-from module_servoctl import *
+from modules.module_servoctl import *
 from evdev import InputDevice, categorize, ecodes, list_devices
 import Adafruit_PCA9685
-from module_config import load_config
+from modules.module_config import load_config
 
 config = load_config()
 controller_name = config["CONTROLS"]["controller_name"]
