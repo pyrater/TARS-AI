@@ -168,6 +168,7 @@ TARS.wav
 /vision
 /llm
 llm/
+stt/
 vision/
 stt/vosk-model-small-en-us-0.15/
 stt/vosk-model-small-en-us-0.15

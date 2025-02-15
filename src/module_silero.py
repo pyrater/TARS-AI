@@ -1,6 +1,8 @@
 """
-Contribution from atomikspace for silero tts
+Contribution from atomikspace for Silero TTS
 """
+
+import wave
 import sounddevice as sd
 import soundfile as sf
 from io import BytesIO
@@ -9,6 +11,11 @@ import torchaudio
 import asyncio
 import re
 import ctypes
+import os
+
+# Set relative path for model storage
+model_dir = os.path.join(os.path.dirname(__file__), "stt")  # Relative to script location
+torch.hub.set_dir(model_dir)  # Set PyTorch hub directory
 
 # === Custom Modules ===
 from module_config import load_config
@@ -33,25 +40,26 @@ asound = ctypes.cdll.LoadLibrary('libasound.so')
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 if CONFIG['TTS']['ttsoption'] == 'silero':
-    model, example_text, languages, speakers = torch.hub.load(
-        repo_or_dir='tts/snakers4/silero-models', 
-        model='silero_tts', 
-        language='en', 
-        speaker='v3_en', 
-        force_reload=True
+    model, example_texts = torch.hub.load(
+        repo_or_dir="snakers4/silero-models",
+        model="silero_tts",
+        language="en",
+        speaker="v3_en"  # Model version, not speaker ID
     )
     model.to(device)
+    sample_rate = 24000  # Set to Silero's recommended sample rate
+    speaker = "en_1"  # Use a valid speaker ID
 
 async def synthesize(text):
     """
-    Synthesize text into a waveform using Silero TTS.
+    Synthesize a chunk of text into a BytesIO buffer using Silero TTS.
     """
     with torch.no_grad():
-        audio_tensor = model.apply_tts(text=text, speaker='v3_en', sample_rate=48000)
-    
+        audio_tensor = model.apply_tts(text=text, speaker=speaker, sample_rate=sample_rate)
+
     # Convert tensor to WAV buffer
     wav_buffer = BytesIO()
-    torchaudio.save(wav_buffer, audio_tensor.unsqueeze(0), 48000, format="wav")
+    torchaudio.save(wav_buffer, audio_tensor.unsqueeze(0), sample_rate, format="wav")
     wav_buffer.seek(0)
     return wav_buffer
 
