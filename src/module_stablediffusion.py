@@ -72,6 +72,7 @@ def get_image_from_dalle_v3(prompt):
         print(f"Error: {e}")
         return None
 
+
 def get_image_from_automatic1111(sdpromptllm):
     # Create the payload with the necessary parameters for the API request
     payload = {
@@ -120,7 +121,7 @@ def get_image_from_automatic1111(sdpromptllm):
         print(f"Error: {e}")
 
     return f"Image generated and displayed in fullscreen."
-  
+
 def display_image_fullscreen(image_path):
     """Function to display an image in fullscreen, scaled to fit the screen, for 8 seconds."""
     # Initialize Pygame
@@ -172,9 +173,10 @@ def display_image_fullscreen(image_path):
 
         # Check if 8 seconds have passed
         if pygame.time.get_ticks() - start_ticks > 8000:
+            pygame.display.quit()
             running = False
+        else:
+            pygame.display.update()
 
-        pygame.display.update()
-
-    # Close Pygame and exit
-    pygame.quit()
+    # Close Pygame window and exit
+    

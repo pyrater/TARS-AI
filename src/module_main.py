@@ -1,9 +1,3 @@
-"""
-module_main.py
-
-Core logic module for the TARS-AI application.
-
-"""
 # === Standard Libraries ===
 import os
 import threading
@@ -19,17 +13,29 @@ from module_btcontroller import start_controls
 from module_tts import generate_tts_audio
 from module_discord import *
 from module_llm import process_completion
+from module_ui import UIManager
 
 # === Constants and Globals ===
 character_manager = None
 memory_manager = None
 stt_manager = None
+ui_manager = None
 
 CONFIG = load_config()
 
 # Global Variables (if needed)
 stop_event = threading.Event()
 executor = concurrent.futures.ProcessPoolExecutor(max_workers=4)
+
+def initialize_ui(ui_mgr):
+    """
+    Initialize the UI manager reference.
+    
+    Parameters:
+    - ui_mgr: The UIManager instance from app.py
+    """
+    global ui_manager
+    ui_manager = ui_mgr
 
 # === Threads ===
 def start_bt_controller_thread():
@@ -38,151 +44,134 @@ def start_bt_controller_thread():
     """
     try:
         print(f"LOAD: Starting BT Controller thread...")
+        ui_manager.update_data("BT Controller", "Starting controller thread", "INFO")
         while not stop_event.is_set():
             start_controls()
     except Exception as e:
-        print(f"ERROR: {e}")
+        error_msg = f"BT Controller error: {e}"
+        print(f"ERROR: {error_msg}")
+        ui_manager.update_data("BT Controller", error_msg, "ERROR")
 
 def stream_text_nonblocking(text, delay=0.03):
     """
     Streams text character by character in a non-blocking way.
-
-    Parameters:
-    - text (str): The text to stream.
-    - delay (float): Delay (in seconds) between each character.
     """
+    # Log to UI console after complete message
+    if text.startswith("USER: "):
+        ui_manager.update_data("Chat", text, "INFO")
+    elif text.startswith("TARS: "):
+        ui_manager.update_data("Chat", text, "SYSTEM")
+
     def stream():
         for char in text:
-            sys.stdout.write(char)  # Write one character at a time
-            sys.stdout.flush()      # Ensure the text is shown immediately
+            sys.stdout.write(char)
+            sys.stdout.flush()
             time.sleep(delay)
         
-        # Explicitly add only one newline
         if not text.endswith("\n"):
             sys.stdout.write("\n")
             sys.stdout.flush()
 
-    # Run the streaming function in a separate thread
     threading.Thread(target=stream, daemon=True).start()
 
-# === Callback Functions ===
 def process_discord_message_callback(user_message):
     """
     Processes the user's message and generates a response.
-
-    Parameters:
-    - user_message (str): The message content sent by the user.
-
-    Returns:
-    - str: The bot's response.
     """
     try:
-        # Parse the user message
-        #print(user_message)
-
         match = re.match(r"<@(\d+)> ?(.*)", user_message)
-
         if match:
-            mentioned_user_id = match.group(1)  # Extracted user ID
-            message_content = match.group(2).strip()  # Extracted message content (trim leading/trailing spaces)
+            mentioned_user_id = match.group(1)
+            message_content = match.group(2).strip()
+            ui_manager.update_data("Discord", f"Message from {mentioned_user_id}: {message_content}", "INFO")
 
-        #stream_text_nonblocking(f"{mentioned_user_id}: {message_content}")
-        #print(message_content)
-
-        # Process the message using process_completion
-        reply = process_completion(message_content)  # Process the message
-
-        #print(f"TARS: {reply}")
-        #stream_text_nonblocking(f"TARS: {reply}")
+        reply = process_completion(message_content)
+        ui_manager.update_data("Discord", f"TARS Reply: {reply}", "SYSTEM")
         
     except Exception as e:
-        print(f"ERROR: {e}")
+        error_msg = f"Discord processing error: {e}"
+        print(f"ERROR: {error_msg}")
+        ui_manager.update_data("Discord", error_msg, "ERROR")
 
     return reply
 
 def wake_word_callback(wake_response):
     """
     Play initial response when wake word is detected.
-
-    Parameters:
-    - wake_response (str): The response to the wake word.
-    """ 
-    generate_tts_audio(wake_response, CONFIG['TTS'])
+    """
+    ui_manager.update_data("Wake Word", "Wake word detected", "INFO")
+    generate_tts_audio(wake_response, CONFIG['TTS']['ttsoption'], CONFIG['TTS']['azure_api_key'], 
+                      CONFIG['TTS']['azure_region'], CONFIG['TTS']['ttsurl'], 
+                      CONFIG['TTS']['toggle_charvoice'], CONFIG['TTS']['tts_voice'])
+    
 
 def utterance_callback(message):
     """
-    Process the recognized message from STTManager and stream audio response to speakers.
-
-    Parameters:
-    - message (str): The recognized message from the Speech-to-Text (STT) module.
+    Process the recognized message from STTManager.
     """
     try:
-        # Parse the user message
         message_dict = json.loads(message)
-        if not message_dict.get('text'):  # Handles cases where text is "" or missing
-            #print(f"TARS: Going Idle...")
+        if not message_dict.get('text'):
             return
         
-        #Print or stream the response
-        #print(f"USER: {message_dict['text']}")
         stream_text_nonblocking(f"USER: {message_dict['text']}")
 
-        # Check for shutdown command
         if "shutdown pc" in message_dict['text'].lower():
-            print(f"SHUTDOWN: Shutting down the PC...")
+            shutdown_msg = "Shutting down the PC..."
+            print(f"SHUTDOWN: {shutdown_msg}")
+            ui_manager.update_data("System", shutdown_msg, "SYSTEM")
             os.system('shutdown /s /t 0')
-            return  # Exit function after issuing shutdown command
-        
-        # Process the message using process_completion
-        reply = process_completion(message_dict['text'])  # Process the message
+            return
 
-        # Extract the <think> block if present
+        reply = process_completion(message_dict['text'])
+
         try:
             match = re.search(r"<think>(.*?)</think>", reply, re.DOTALL)
             thoughts = match.group(1).strip() if match else ""
-            
-            # Remove the <think> block and clean up trailing whitespace/newlines
             reply = re.sub(r"<think>.*?</think>", "", reply, flags=re.DOTALL).strip()
+            
+            if thoughts:
+                ui_manager.update_data("Thoughts", thoughts, "DEBUG")
         except Exception:
             thoughts = ""
 
-        # Debug output for thoughts
-        if thoughts:
-            #print(f"DEBUG: Thoughts\n{thoughts}")
-            pass
-
-        # Stream the AI's reply
         stream_text_nonblocking(f"TARS: {reply}")
-
-        # Strip special chars so he doesnt say them
         reply = re.sub(r'[^a-zA-Z0-9\s.,?!;:"\'-]', '', reply)
         
-        # Stream TTS audio to speakers
-        generate_tts_audio(reply, CONFIG['TTS'])
+        generate_tts_audio(
+            reply,
+            CONFIG['TTS']['ttsoption'],
+            CONFIG['TTS']['azure_api_key'],
+            CONFIG['TTS']['azure_region'],
+            CONFIG['TTS']['ttsurl'],
+            CONFIG['TTS']['toggle_charvoice'],
+            CONFIG['TTS']['tts_voice']
+        )
 
     except json.JSONDecodeError:
-        print("ERROR: Invalid JSON format. Could not process user message.")
+        error_msg = "Invalid JSON format. Could not process user message."
+        print(f"ERROR: {error_msg}")
+        ui_manager.update_data("JSON", error_msg, "ERROR")
     except Exception as e:
-        print(f"ERROR: {e}")
+        error_msg = f"Error processing message: {e}"
+        print(f"ERROR: {error_msg}")
+        ui_manager.update_data("Processing", error_msg, "ERROR")
 
 def post_utterance_callback():
     """
     Restart listening for another utterance after handling the current one.
     """
     global stt_manager
+    ui_manager.update_data("STT", "Ready for next utterance", "INFO")
     stt_manager._transcribe_utterance()
 
 # === Initialization ===
 def initialize_managers(mem_manager, char_manager, stt_mgr):
     """
-    Pass in the shared instances for MemoryManager, CharacterManager, and STTManager.
-    
-    Parameters:
-    - mem_manager: The MemoryManager instance from app.py.
-    - char_manager: The CharacterManager instance from app.py.
-    - stt_mgr: The STTManager instance from app.py.
+    Pass in the shared instances for managers.
     """
     global memory_manager, character_manager, stt_manager
     memory_manager = mem_manager
     character_manager = char_manager
     stt_manager = stt_mgr
+    ui_manager.update_data("System", "All managers initialized", "SYSTEM")

@@ -1,0 +1,22 @@
+sudo apt update
+sudo apt install raspberrypi-kernel-headers
+Clone the driver repository: Navigate to your home directory and clone the Waveshare WM8960 Audio HAT driver repository:
+
+bash
+Copy
+Edit
+cd ~
+git clone https://github.com/waveshare/WM8960-Audio-HAT.git
+Install the driver: Navigate to the cloned directory and run the installation script:
+
+bash
+Copy
+Edit
+cd WM8960-Audio-HAT
+sudo ./install.sh
+Reboot your Raspberry Pi: After the installation completes, reboot your system:
+
+bash
+Copy
+Edit
+sudo reboot
