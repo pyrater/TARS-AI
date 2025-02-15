@@ -90,34 +90,59 @@ class MemoryManager:
         - str: Relevant memories or a fallback message.
         """
         try:
-            results = self.hyper_db.query(
-                query, 
-                top_k=self.top_k, 
-                return_similarities=False
-            )
-            
-            if results:
-                memory = results[0]
-                memory_list = self.hyper_db.dict()
+            # Get full memory list and count
+            memory_list = self.hyper_db.dict()
+            memory_count = len(memory_list)
 
-                # Find the index of the memory for context retrieval
-                start_index = next((i for i, d in enumerate(memory_list) if d['document'] == memory), None)
+            if memory_count == 0:
+                return f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] WARN: Memory database is empty."
 
-                if start_index is not None:
-                    prev_count = 1
-                    post_count = 1
+            # Ensure top_k does not exceed available memories
+            safe_top_k = min(self.top_k, max(1, memory_count))
+     
+            # Debugging Output
+            print(f"DEBUG: Memory count = {memory_count}, safe_top_k = {safe_top_k}")
 
-                    # Calculate indices for surrounding context
-                    start = max(start_index - prev_count, 0)
-                    end = min(start_index + post_count + 1, len(memory_list))
+            # Perform a safe query
+            results = self.hyper_db.query(query, top_k=safe_top_k, return_similarities=False)
 
-                    # Retrieve and format the context memories
-                    result = [memory_list[i]['document'] for i in range(start, end)]
-                    return result
-                else:
-                    return f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] WARN: Could not locate memory in the database. Memory: {memory}"
-            else:
+            if not results:
                 return f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] WARN: No memories found for the query."
+
+            # Ensure retrieved memories are valid
+            valid_memories = [mem for mem in results if any(m['document'] == mem for m in memory_list)]
+
+            if not valid_memories:
+                return f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] WARN: Retrieved memories are not valid."
+
+            memory = valid_memories[0]
+
+            # Safe retrieval of index
+            start_index = next((i for i, d in enumerate(memory_list) if d['document'] == memory), None)
+
+            # 🚨 Absolute final check to prevent invalid indices 🚨
+            if start_index is None or start_index < 0 or start_index >= memory_count:
+                print(f"DEBUG: Invalid index detected ({start_index}). Forcing safe fallback.")
+                start_index = max(0, min(memory_count - 1, start_index or 0))  # Fallback to safe index
+
+            # Define safe index range
+            prev_count = 1
+            post_count = 1
+
+            # Prevent out-of-bounds indexing
+            start = max(0, start_index - prev_count)
+            end = min(memory_count, start_index + post_count + 1)
+
+            # 🚀 Final safety check before returning results
+            if start < 0 or end > memory_count:
+                print(f"DEBUG: Adjusting bounds - Start: {start}, End: {end}, Memory Count: {memory_count}")
+                start = max(0, start)
+                end = min(memory_count, end)
+
+            # Retrieve and return memories safely
+            result = [memory_list[i]['document'] for i in range(start, end)]
+            return result
+
         except Exception as e:
             print(f"ERROR: Error retrieving related memories: {e}")
             return "Error retrieving related memories."

@@ -135,7 +135,7 @@ class STTManager:
 
     def _load_vosk_model(self):
         """Load the Vosk model from the configured path."""
-        model_path = os.path.join("..", "stt", self.config.get("STT", {}).get("vosk_model", "default_vosk_model"))
+        model_path = os.path.join("stt", self.config.get("STT", {}).get("vosk_model", "default_vosk_model"))
         if not os.path.exists(model_path):
             print("ERROR: Vosk model not found.")
             return
