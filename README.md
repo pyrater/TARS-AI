@@ -46,5 +46,5 @@ TARS-AI is licensed under the [CC-BY-NC License](./LICENSE). See the [License Pa
 
 ## Attribution 
 ### TARS Project Attribution Guidelines
-As we continue to build and expand upon the TARS project, below are the guidelines for attribution and best practices when sharing or publishing work related to the TARS project:
+As we continue to build and expand upon the TARS project, please review the guidelines for attribution and best practices when sharing or publishing work related to the TARS project [Attribution Page](https://github.com/pyrater/TARS-AI/blob/main/Attribution.md)
 
