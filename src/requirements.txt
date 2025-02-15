@@ -25,6 +25,7 @@ configobj #needed to keep comments in the config.ini when updating
 openai
 librosa
 whisper
+faster-whisper
 silero-vad
 bm25s
 pystemmer
