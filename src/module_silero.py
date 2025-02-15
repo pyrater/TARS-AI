@@ -1,5 +1,5 @@
 """
-Contribution from atomikspace for Silero TTS
+Enhanced Silero TTS with TARS Effects, Audio Normalization, and Better Playback
 """
 
 import wave
@@ -12,6 +12,7 @@ import asyncio
 import re
 import ctypes
 import os
+from pydub import AudioSegment, effects
 
 # Set relative path for model storage
 model_dir = os.path.join(os.path.dirname(__file__), "stt")  # Relative to script location
@@ -48,11 +49,27 @@ if CONFIG['TTS']['ttsoption'] == 'silero':
     )
     model.to(device)
     sample_rate = 24000  # Set to Silero's recommended sample rate
-    speaker = "en_1"  # Use a valid speaker ID
+    speaker = "en_2"  # Use a valid speaker ID
+
+def apply_tars_effects(audio):
+    """
+    Apply TARS-like effects: pitch change, speed up, reverb, and echo.
+    """
+    lower_rate = int(sample_rate * 0.88)
+    audio = audio._spawn(audio.raw_data, overrides={"frame_rate": lower_rate})
+    audio = audio.set_frame_rate(sample_rate)
+    audio = audio.speedup(playback_speed=1.42)
+    reverb_decay = -2
+    delay_ms = 3
+    echo1 = audio - reverb_decay
+    echo2 = echo1 - 1
+    audio = audio.overlay(echo1, position=delay_ms)
+    audio = audio.overlay(echo2, position=delay_ms * 1)
+    return audio
 
 async def synthesize(text):
     """
-    Synthesize a chunk of text into a BytesIO buffer using Silero TTS.
+    Synthesize a chunk of text into an AudioSegment using Silero TTS.
     """
     with torch.no_grad():
         audio_tensor = model.apply_tts(text=text, speaker=speaker, sample_rate=sample_rate)
@@ -61,12 +78,20 @@ async def synthesize(text):
     wav_buffer = BytesIO()
     torchaudio.save(wav_buffer, audio_tensor.unsqueeze(0), sample_rate, format="wav")
     wav_buffer.seek(0)
-    return wav_buffer
 
-async def play_audio(wav_buffer):
+    # Load audio into Pydub
+    audio = AudioSegment.from_file(wav_buffer, format="wav")
+    audio = apply_tars_effects(audio)  # Apply TARS-like effects
+    return audio
+
+async def play_audio(audio):
     """
-    Play audio from a BytesIO buffer.
+    Play audio from a Pydub AudioSegment.
     """
+    wav_buffer = BytesIO()
+    audio.export(wav_buffer, format="wav")
+    wav_buffer.seek(0)
+
     data, samplerate = sf.read(wav_buffer, dtype='float32')
     # Set the custom error handler
     asound.snd_lib_error_set_handler(c_error_handler)
@@ -77,7 +102,7 @@ async def play_audio(wav_buffer):
 
 async def text_to_speech_with_pipelining_silero(text):
     """
-    Converts text to speech using Silero TTS and streams audio playback with pipelining.
+    Converts text to speech using Silero TTS, applies TARS effects, and streams playback.
     """
     # Split text into smaller chunks
     chunks = re.split(r'(?<=\.)\s', text)  # Split at sentence boundaries
@@ -85,5 +110,5 @@ async def text_to_speech_with_pipelining_silero(text):
     # Process and play chunks sequentially
     for chunk in chunks:
         if chunk.strip():  # Ignore empty chunks
-            wav_buffer = await synthesize(chunk.strip())
-            await play_audio(wav_buffer)
+            audio = await synthesize(chunk.strip())
+            await play_audio(audio)

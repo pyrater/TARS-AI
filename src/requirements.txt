@@ -30,6 +30,8 @@ silero-vad
 bm25s
 pystemmer
 elevenlabs
+pydub # needed for voice modifications
+
 #espeak-ng
 #alsa-utils
 #sudo apt install ffmpeg
