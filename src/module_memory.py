@@ -101,7 +101,7 @@ class MemoryManager:
             safe_top_k = min(self.top_k, max(1, memory_count))
      
             # Debugging Output
-            print(f"DEBUG: Memory count = {memory_count}, safe_top_k = {safe_top_k}")
+            #print(f"DEBUG: Memory count = {memory_count}, safe_top_k = {safe_top_k}")
 
             # Perform a safe query
             results = self.hyper_db.query(query, top_k=safe_top_k, return_similarities=False)
