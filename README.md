@@ -1,8 +1,8 @@
-# TARS-AI
+<h1 align="center">TARS-AI</h2>
 
 <p align="center">
     <a href="https://discord.gg/AmE2Gv9EUt">
-      <img alt="Discord Invitation Link" src="https://dcbadge.vercel.app/api/server/uXkqkz3mJJ?style=flat" align="center" />
+      <img alt="discord invitation link" src="https://dcbadge.vercel.app/api/server/uXkqkz3mJJ?style=flat" align="center" />
     </a>
     <a href="https://www.youtube.com/@TARS-AI.py.youtube">
         <img src="https://img.shields.io/badge/YouTube-red?style=flat-square&logo=youtube&logoColor=white" alt="YouTube" align="center" />
@@ -15,12 +15,8 @@
     </a>
 </p>
 
-<p align="center">
-  <a href="https://github.com/pyrater/TARS-AI">
-    <img width="50%" alt="" src="/media/tars-ai.png" />
-  </a>
-</p>
-
+<p align="center"><a href="https://github.com/pyrater/TARS-AI"><img width=50% alt="" src="/media/tars-ai.png" /></a></p>
+ 
 TARS-AI is a fan-made recreation of the TARS robot from *Interstellar*, featuring AI capabilities and servo-driven movement.
 
 ## Documentation & Build Instructions
@@ -54,29 +50,4 @@ TARS-AI is licensed under the [CC-BY-NC License](./LICENSE). See the [License Pa
 
 ## Attribution
 
-As we continue to build and expand upon the TARS project, please follow these guidelines when sharing or publishing related work:
-
-### General Attribution
-- Clearly state that this project is inspired by the character TARS from *Interstellar*.
-- When referencing or sharing CAD designs, include:
-  > "Based on the mechanical puppet designs by Christopher Nolan, Nathan Crowley, and the production team who originally brought TARS to life—miniaturized CAD by Charlie Diaz, with additional modifications by the TARS-AI Community."
-
-### CAD and Code Attribution
-- Credit Charlie Diaz for the original CAD files.
-- Clearly document modifications and contributions.
-
-### Usage of TARS’ Voice and Personality
-- This project includes AI-generated elements inspired by Bill Irwin’s portrayal of TARS in *Interstellar*.
-
-### Sharing Content Online
-- Attribute the original film’s production team and Charlie Diaz where applicable.
-- Include a disclaimer noting that this project is a fan-made initiative.
-
-### Legal Considerations
-- Monetization of the project is **strictly prohibited**.
-
-### Community Contribution
-- Follow these attribution guidelines when making modifications or additions to the project.
-- Maintain transparency in crediting all contributors.
-
-These guidelines help ensure the TARS-AI project respects the original creators while fostering a collaborative and innovative community. For more details, check the [Attribution Guide](https://github.com/pyrater/TARS-AI/wiki/Attribution).
+For more details, check the [Attribution Guide](https://github.com/pyrater/TARS-AI/wiki/Attribution).
