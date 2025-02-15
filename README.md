@@ -15,17 +15,9 @@
     </a>
 </p>
 
-<p align="center">
-  <a href="https://github.com/pyrater/TARS-AI">
-    <img width="50%" alt="" src="/media/tars-ai.png" />
-  </a>
-</p>
+<p align="center"><a href="https://github.com/pyrater/TARS-AI"><img width=50% alt="" src="/media/tars-ai.png" /></a></p>
 
-TARS-AI is a fan-made recreation of the TARS robot from *Interstellar*, featuring AI capabilities and servo-driven movement.
-
-## Documentation & Build Instructions
-
-For detailed setup guides, software installation, and hardware wiring, refer to the [TARS-AI Wiki](https://github.com/pyrater/TARS-AI/wiki).
+A recreation of the TARS robot from Interstellar, featuring AI capabilities and servo-driven movement. 
 
 ## Table of Contents
 - [Hardware Requirements](#hardware-requirements)
@@ -52,31 +44,33 @@ Interested in contributing? Read our [Contributing Guidelines](https://github.co
 
 TARS-AI is licensed under the [CC-BY-NC License](./LICENSE). See the [License Page](https://github.com/pyrater/TARS-AI/wiki/License) for more details.
 
-## Attribution
+## Attribution 
+### TARS Project Attribution Guidelines
+As we continue to build and expand upon the TARS project, below are the guidelines for attribution and best practices when sharing or publishing work related to the TARS project:
 
-As we continue to build and expand upon the TARS project, please follow these guidelines when sharing or publishing related work:
+#### General Attribution
+- Clearly state that this project is based on the character TARS from the film *Interstellar*.
+- When referencing or sharing the CAD designs:
+  - Include a statement like: “Based on the mechanical puppet designs by Christopher Nolan, Nathan Crowley, and the production team who originally brought TARS to life—miniaturized CAD by Charlie Diaz, with additional modifications by the TARS-AI Community.”
 
-### General Attribution
-- Clearly state that this project is inspired by the character TARS from *Interstellar*.
-- When referencing or sharing CAD designs, include:
-  > "Based on the mechanical puppet designs by Christopher Nolan, Nathan Crowley, and the production team who originally brought TARS to life—miniaturized CAD by Charlie Diaz, with additional modifications by the TARS-AI Community."
+#### Specific Guidelines for CAD and Scripts
+- The original CAD files and scripts are provided by Charlie Diaz. If you modify or extend these, ensure to:
+  - Credit Charlie Diaz as the original creator of the CAD files.
+  - Clearly specify your contributions or modifications.
 
-### CAD and Code Attribution
-- Credit Charlie Diaz for the original CAD files.
-- Clearly document modifications and contributions.
+#### Usage of TARS’ Voice and Personality
+  - “This project includes AI-generated elements inspired by Bill Irwin’s portrayal of TARS in the film *Interstellar*.”
 
-### Usage of TARS’ Voice and Personality
-- This project includes AI-generated elements inspired by Bill Irwin’s portrayal of TARS in *Interstellar*.
+#### Sharing Content Online
+- When publishing content (e.g., YouTube videos, blog posts, or repository updates):
+  - Attribute the original film’s production team and Charlie Diaz where applicable.
+  - Include a disclaimer noting that this project is a fan-made initiative.
 
-### Sharing Content Online
-- Attribute the original film’s production team and Charlie Diaz where applicable.
-- Include a disclaimer noting that this project is a fan-made initiative.
+#### Legal Considerations
+- Monetization is strictly prohibited.
 
-### Legal Considerations
-- Monetization of the project is **strictly prohibited**.
+#### Community Contribution
+- Encourage contributors to follow these attribution guidelines when making modifications or additions to the project.
+- Foster an open and respectful community by maintaining transparency in crediting the work of all contributors.
 
-### Community Contribution
-- Follow these attribution guidelines when making modifications or additions to the project.
-- Maintain transparency in crediting all contributors.
-
-These guidelines help ensure the TARS-AI project respects the original creators while fostering a collaborative and innovative community. For more details, check the [Attribution Guide](https://github.com/pyrater/TARS-AI/wiki/Attribution).
+These guidelines ensure that the TARS project respects the intellectual property of the original creators while fostering a collaborative and innovative community. Let’s work together to keep this project thriving and inspiring!
