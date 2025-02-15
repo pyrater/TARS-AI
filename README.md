@@ -22,6 +22,7 @@ A recreation of the TARS robot from Interstellar, featuring AI capabilities and 
 ## Table of Contents
 - [Hardware Requirements](#https://github.com/pyrater/TARS-AI/wiki/Hardware-Requirements)
 - [Software Stack](#https://github.com/pyrater/TARS-AI/wiki/Software-Stack)
+- [Enviroment Setup](#https://github.com/pyrater/TARS-AI/blob/main/ENVSETUP.md)
 - [Contributing](#https://github.com/pyrater/TARS-AI/blob/main/CONTRIBUTING.md)
 - [License](#https://github.com/pyrater/TARS-AI/blob/main/LICENSE)
 - [Attribution](#https://github.com/pyrater/TARS-AI/blob/main/Attribution.md)
