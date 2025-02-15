@@ -176,7 +176,8 @@ captured_image.jpg
 config.ini
 output.wav
 /memory/initial_memory.json
-/memory/initial_memory.loaded
+src/memory/initial_memory.loaded
+/src/memory/initial_memory.loaded
 memory/initial_memory.json
 memory/initial_memory.loaded
 ./tars.sh
