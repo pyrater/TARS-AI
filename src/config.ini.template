@@ -16,6 +16,8 @@ whisper_model = tiny
 vosk_model = vosk-model-small-en-us-0.15
 # Model to use for local / onboard tts from https://alphacephei.com/vosk/models (Recommended: vosk-model-small-en-us-0.15)
 use_indicators = True
+vad_enabled = False
+# Enable Silero VAD instead of RMS 
 
 [CHAR] # Character-specific details
 character_card_path = character/TARS.json
@@ -78,6 +80,10 @@ toggle_charvoice = True
 # Use character-specific voice settings
 tts_voice = en-US-Steffan:DragonHDLatestNeural
 # Name of the cloned voice to use (e.g., TARS2)
+voice_id = "JBFqnCBsd6RMkjVDRZzb"
+# Voice ID of ElevenLabs (e.g.,JBFqnCBsd6RMkjVDRZzb)
+model_id = "eleven_multilingual_v2"
+# Model ID of ElevenLabs (e.g.,eleven_multilingual_v2)
 voice_only = False
 # If True, only generate voice responses (no text)
 is_talking_override = False
@@ -116,6 +122,13 @@ restore_faces = False
 # Set to True if you want better face rendering in the generated image.
 negative_prompt = deformed, black and white, disfigured, low contrast, extra limbs, bad anatomy, bad hands
 # The model will attempt to avoid creating images with these characteristics.
+
+[RAG]
+# RAG (Retrieval Augmented Generation) settings
+strategy = hybrid
+# Options: naive (vector-only), hybrid (vector + BM25)
+top_k = 5
+# Number of documents to retrieve
 
 [HOME_ASSISTANT] # HA Module
 enabled = False
