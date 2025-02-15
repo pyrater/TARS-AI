@@ -12,6 +12,9 @@ import re
 import concurrent.futures
 import sys
 import time
+import asyncio
+import sounddevice as sd
+import soundfile as sf
 
 # === Custom Modules ===
 from modules.module_config import load_config
@@ -158,12 +161,25 @@ def utterance_callback(message):
         reply = re.sub(r'[^a-zA-Z0-9\s.,?!;:"\'-]', '', reply)
         
         # Stream TTS audio to speakers
-        generate_tts_audio(reply, CONFIG['TTS'])
+        asyncio.run(play_audio_chunks(reply, CONFIG['TTS']))
 
     except json.JSONDecodeError:
         print("ERROR: Invalid JSON format. Could not process user message.")
     except Exception as e:
         print(f"ERROR: {e}")
+
+async def play_audio_chunks(text, config):
+    """
+    Plays audio chunks sequentially from the generate_tts_audio function.
+    """
+    async for audio_chunk in generate_tts_audio(text, config):
+        try:
+            # Read the audio chunk into a format playable by sounddevice
+            data, samplerate = sf.read(audio_chunk, dtype='float32')
+            sd.play(data, samplerate)
+            await asyncio.sleep(len(data) / samplerate)  # Wait for playback to finish
+        except Exception as e:
+            print(f"ERROR: Failed to play audio chunk: {e}")
 
 def post_utterance_callback():
     """

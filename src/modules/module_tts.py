@@ -241,7 +241,7 @@ def server_tts(text, ttsurl, tts_voice):
     except Exception as e:
         print(f"ERROR: Server TTS generation failed: {e}")
 
-def generate_tts_audio(text: str, config):
+async def generate_tts_audio(text: str, config):
     """
     Generate TTS audio for the given text using the specified TTS system.
     Handles both dictionary-style config and TTSConfig objects for backward compatibility.
@@ -271,9 +271,9 @@ def generate_tts_audio(text: str, config):
         elif ttsoption == "alltalk" and toggle_charvoice:
             alltalk_tts(text, config['ttsurl'], config['tts_voice'])
             
-        elif ttsoption == "piper" and toggle_charvoice:
-            import asyncio
-            asyncio.run(text_to_speech_with_pipelining(text))
+        if ttsoption == "piper" and toggle_charvoice:
+            async for chunk in text_to_speech_with_pipelining(text):
+                yield chunk  # Yield each chunk to be processed later
 
         elif ttsoption == "silero":
             import asyncio

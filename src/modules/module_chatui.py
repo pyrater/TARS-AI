@@ -29,6 +29,7 @@ import threading, time, math, random, io
 from PIL import Image
 import logging
 import json
+import asyncio
 
 from flask import (
     Flask,
@@ -329,56 +330,41 @@ def upload():
     else:
         return 'No file part', 400
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @flask_app.route('/audio_stream')
 def audio_stream():
     global is_talking
     is_talking = False
 
-    def generate():
-        #read all or just stuff in quotes?
+    async def get_audio_chunks():
+        """Generate and yield TTS audio chunks asynchronously."""
         if CONFIG['TTS']['voice_only'] == "True":
             extracted_text = re.findall(r'"(.*?)"', latest_text_to_read)
             final_text = ' '.join(extracted_text)
         else:
             final_text = latest_text_to_read
 
-        for chunk in generate_tts_audio(final_text, CONFIG['TTS']):
-            yield chunk
+        async for chunk in generate_tts_audio(final_text, CONFIG['TTS']):
+            yield chunk.getvalue()  # Convert BytesIO to raw bytes for streaming
+
+    def generate():
+        """Sync wrapper to consume the async generator properly."""
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        async_gen = get_audio_chunks()
+
+        try:
+            # Iterate over async generator using `asyncio.run()`
+            for chunk in loop.run_until_complete(consume_async_gen(async_gen)):
+                yield chunk
+        finally:
+            loop.close()
+
+    async def consume_async_gen(async_gen):
+        """Helper function to fully iterate through an async generator."""
+        return [chunk async for chunk in async_gen]  # Collect all chunks
+
     return Response(generate(), mimetype="audio/mpeg")
-
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 def start_flask_app():
