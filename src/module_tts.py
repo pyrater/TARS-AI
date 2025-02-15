@@ -18,7 +18,8 @@ import numpy as np
 import sounddevice as sd
 import soundfile as sf
 from io import BytesIO
-from module_piper import *
+from module_piper import text_to_speech_with_pipelining
+from module_silero import text_to_speech_with_pipelining_silero
 from elevenlabs.client import ElevenLabs
 from elevenlabs import play
 
@@ -273,6 +274,9 @@ def generate_tts_audio(text: str, config):
         elif ttsoption == "piper" and toggle_charvoice:
             import asyncio
             asyncio.run(text_to_speech_with_pipelining(text))
+
+        elif ttsoption == "silero":
+            asyncio.run(text_to_speech_with_pipelining_silero(text))
             
         elif ttsoption == "xttsv2" and toggle_charvoice:
             server_tts(text, config['ttsurl'], config['tts_voice'])
