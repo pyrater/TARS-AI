@@ -312,6 +312,9 @@ class MemoryManager:
             except requests.exceptions.RequestException as e:
                 print(f"ERROR: Request to {llm_backend} token count API failed: {e}")
                 return {"length": 0}
+        
+        elif llm_backend == "local":
+            return {"length": 0}
 
         else:
             print(f"ERROR: Unsupported LLM backend: {llm_backend}")

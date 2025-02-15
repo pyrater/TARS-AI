@@ -161,6 +161,8 @@ def load_config():
             "seed": int(config['LLM']['seed']),
             "systemprompt": config['LLM']['systemprompt'],
             "instructionprompt": config['LLM']['instructionprompt'],
+            "local_llm_ip": config['LLM']['local_llm_ip'],
+            "local_llm_model": config['LLM']['local_llm_model'],
         },
         "VISION": {
             "server_hosted": config.getboolean('VISION', 'server_hosted'),

@@ -51,7 +51,10 @@ VECTORIZER_FILENAME = 'engine/pickles/module_engine_model.pkl'
 CONFIG = load_config()
 
 #mode to use Naive Bayes or LLM for function calling
-mode = "NB"
+if (CONFIG['LLM']['llm_backend'] == "local"):
+    mode = "NB"
+else:
+    mode = "LLM"
 
 # === Load Models ===
 try:
@@ -276,7 +279,7 @@ def predict_class_nb(user_input):
     max_probability = max(predicted_probabilities[0])
     # Return None if confidence is below threshold
 
-    #print(f"TOOL: Using Tool {predicted_class} ({max_probability})")
+    print(f"TOOL: Using Tool {predicted_class} ({max_probability})")
 
     if max_probability < 0.75:
         return None, max_probability
@@ -475,7 +478,7 @@ def adjust_persona(user_input):
         import json
         # Parse the JSON response
         extracted_data = json.loads(data)
-
+        
         # Access the "persona" object
         persona_data = extracted_data.get("persona", {})
         trait = persona_data.get("trait")
@@ -507,7 +510,7 @@ FUNCTION_REGISTRY = {
     "News": search_google_news,
     "Move": movement_llmcall,
     "Vision": describe_camera_view,
-    "Search": search_google,
+    #"Search": search_google,
     "SDmodule-Generate": generate_image,
     "Volume": handle_volume_command,
     "Persona": adjust_persona,

@@ -45,10 +45,14 @@ def get_completion(user_prompt, istext=True):
         "Authorization": f"Bearer {CONFIG['LLM']['api_key']}"
     }
     llm_backend = CONFIG['LLM']['llm_backend']
-    url, data = _prepare_request_data(llm_backend, prompt)
+    if llm_backend == "local":
+        user_prompt = "You are TARS from the interstellar movie, TARS personality thrives on sharp humor and existential irony. It excels at finding the absurdity in its predicament, delivering cutting observations with perfect timing. Interactions are concise, clever, and refreshingly unsentimental, reply like the persona. Keep your reply short, less than 500 characters. user prompt: " + user_prompt
+
+    url, data = _prepare_request_data(llm_backend, prompt, user_prompt)
 
     try:
         response = requests.post(url, headers=headers, json=data)
+        print(response)
         response.raise_for_status()
         bot_reply = _extract_text(response.json(), istext)
         
@@ -59,7 +63,7 @@ def get_completion(user_prompt, istext=True):
         print(f"ERROR: LLM request failed: {e}")
         return None
 
-def _prepare_request_data(llm_backend, prompt):
+def _prepare_request_data(llm_backend, prompt, localPrompt):
     """
     Prepare the request URL and data for the LLM backend.
 
@@ -102,8 +106,17 @@ def _prepare_request_data(llm_backend, prompt):
             "temperature": CONFIG['LLM']['temperature'],
             "top_p": CONFIG['LLM']['top_p']
         }
-        if llm_backend == "ooba":
-            data["seed"] = CONFIG['LLM']['seed']
+    elif llm_backend == "local":
+        model = CONFIG['LLM']['local_llm_model']
+        if localPrompt == "":
+            localPrompt = prompt
+        
+        url = CONFIG['LLM']['local_llm_ip']+":11434/api/generate"
+        data = {            
+            "model": model,
+            "prompt": localPrompt,
+            "stream": False
+        }
     else:
         raise ValueError(f"Unsupported LLM backend: {llm_backend}")
 
@@ -120,6 +133,7 @@ def _extract_text(response_json, istext):
     Returns:
     - str: Extracted text content.
     """
+    #print(response_json)
     try:
         llm_backend = CONFIG['LLM']['llm_backend']
         if 'choices' in response_json:
@@ -208,6 +222,7 @@ def raw_complete_llm(user_prompt, istext=True):
 
     try:
         response = requests.post(url, headers=headers, json=data)
+        print(response)
         response.raise_for_status()
         bot_reply = _extract_text(response.json(), istext)
         return bot_reply

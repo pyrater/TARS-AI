@@ -68,7 +68,7 @@ def update_tts_settings(ttsurl):
     except Exception as e:
         print(f"ERROR: TTS update failed: {e}")
 
-def play_audio_stream(tts_stream, samplerate=22050, channels=1, gain=1.0, normalize=False):
+def play_audio_stream(tts_stream, samplerate=22050, channels=1, gain=5.0, normalize=False):
     """
     Play the audio stream through speakers using SoundDevice with volume/gain adjustment.
     
@@ -279,8 +279,14 @@ def generate_tts_audio(text: str, config):
             asyncio.run(text_to_speech_with_pipelining_silero(text))
             
         elif ttsoption == "xttsv2" and toggle_charvoice:
-            server_tts(text, config['ttsurl'], config['tts_voice'])
-            
+            if not ttsurl:
+                raise ValueError(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] ERROR: TTS URL and play_audio_stream function must be provided for 'xttsv2'.")
+            server_tts(text, ttsurl, tts_voice)
+
+        # Local TTS generation using local onboard PIPER TTS
+        elif ttsoption == "silero":
+            asyncio.run(text_to_speech_with_pipelining_silero(text))
+
         else:
             raise ValueError(f"Invalid TTS option or character voice flag: {ttsoption}")
             
